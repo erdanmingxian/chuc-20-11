@@ -1,15 +1,19 @@
 /* ==========================================================
    20/11 Greeting Website for Anh Khal
    Theme: Impressionist Sunlit Forest & Soaring Light Birds
-   - Living canvas with glowing birds of light & golden sun dust
-   - Ambient peaceful harp/piano chord synthesis via Web Audio API
+   Enhanced:
+   - Always-on Auto Ambient Audio
+   - Interactive mouse/touch stardust trails
+   - Interactive radiant ripples on click/tap
+   - 3D Card tilt interaction
 ========================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('natureCanvas');
   const ctx = canvas.getContext('2d');
-  const soundBtn = document.getElementById('soundToggleBtn');
-  const soundLabel = document.getElementById('soundLabel');
+  const letterCard = document.getElementById('letterCard');
+  const audioIndicator = document.getElementById('audioIndicator');
+  const audioStatusText = document.getElementById('audioStatusText');
 
   function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -19,9 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
   resizeCanvas();
 
   /* ----------------------------------------------------------
-     1. GOLDEN SUNLIGHT PARTICLES & DUST
+     1. CONTINUOUS & INTERACTIVE PARTICLES
   ----------------------------------------------------------- */
   const particles = [];
+  const interactiveParticles = [];
+  const ripples = [];
   const PARTICLE_COUNT = 45;
 
   class SunDust {
@@ -39,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.maxAlpha = this.alpha;
       this.fadeSpeed = Math.random() * 0.006 + 0.003;
       this.fadingIn = true;
-      this.hue = Math.random() * 25 + 42; // warm yellow/gold hues
+      this.hue = Math.random() * 25 + 42;
     }
 
     update() {
@@ -80,8 +86,69 @@ document.addEventListener('DOMContentLoaded', () => {
     particles.push(new SunDust());
   }
 
+  // Interactive Cursor Sparkle
+  class Stardust {
+    constructor(x, y, vx, vy) {
+      this.x = x;
+      this.y = y;
+      this.vx = vx || (Math.random() - 0.5) * 1.5;
+      this.vy = vy || (Math.random() - 0.5) * 1.5;
+      this.size = Math.random() * 3 + 1.5;
+      this.alpha = 1;
+      this.decay = Math.random() * 0.02 + 0.015;
+      this.color = Math.random() > 0.4 ? '#fff0be' : '#f6d365';
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.alpha -= this.decay;
+    }
+
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, this.alpha);
+      ctx.fillStyle = this.color;
+      ctx.shadowColor = this.color;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // Interactive Click Ripple
+  class LightRipple {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.radius = 10;
+      this.maxRadius = 140;
+      this.alpha = 0.8;
+    }
+
+    update() {
+      this.radius += 3.2;
+      this.alpha -= 0.02;
+    }
+
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, this.alpha);
+      ctx.strokeStyle = '#fff0be';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#f6d365';
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
   /* ----------------------------------------------------------
-     2. GLOWING BIRDS OF LIGHT (Like in the artwork)
+     2. GLOWING BIRDS OF LIGHT
   ----------------------------------------------------------- */
   const birds = [];
   const birdTrails = [];
@@ -107,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
       this.y += Math.sin(this.angle) * this.speed;
       this.wingAngle += this.wingSpeed;
 
-      // Add trail point
       if (Math.random() < 0.65) {
         birdTrails.push({
           x: this.x - 10,
@@ -131,13 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const wingY = Math.sin(this.wingAngle) * 14;
 
-      // Glowing aura
       ctx.shadowColor = '#fff6bd';
       ctx.shadowBlur = 25;
       ctx.fillStyle = '#ffffff';
 
       ctx.beginPath();
-      // Bird head & body
       ctx.ellipse(8, 0, 11, 4, 0, 0, Math.PI * 2);
       ctx.fill();
 
@@ -168,7 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Create 3 birds with different initial positions
   for (let i = 0; i < 3; i++) {
     const bird = new LightBird();
     bird.x = Math.random() * canvas.width * 0.8;
@@ -176,18 +239,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ----------------------------------------------------------
-     3. MAIN RENDER LOOP
+     3. RENDER LOOP
   ----------------------------------------------------------- */
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Update & draw particles
+    // Sun dust
     particles.forEach(p => {
       p.update();
       p.draw();
     });
 
-    // Update & draw bird stardust trails
+    // Bird trails
     for (let i = birdTrails.length - 1; i >= 0; i--) {
       const t = birdTrails[i];
       t.alpha -= 0.015;
@@ -207,18 +270,95 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.restore();
     }
 
-    // Update & draw birds
+    // Birds
     birds.forEach(bird => {
       bird.update();
       bird.draw();
     });
+
+    // Interactive Stardust
+    for (let i = interactiveParticles.length - 1; i >= 0; i--) {
+      const sp = interactiveParticles[i];
+      sp.update();
+      sp.draw();
+      if (sp.alpha <= 0) {
+        interactiveParticles.splice(i, 1);
+      }
+    }
+
+    // Interactive Ripples
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      const rp = ripples[i];
+      rp.update();
+      rp.draw();
+      if (rp.alpha <= 0) {
+        ripples.splice(i, 1);
+      }
+    }
 
     requestAnimationFrame(render);
   }
   render();
 
   /* ----------------------------------------------------------
-     4. PEACEFUL AMBIENT HARP / CHIMES (Web Audio API)
+     4. USER INTERACTION: MOUSE & TOUCH MAGIC
+  ----------------------------------------------------------- */
+  let lastX = 0, lastY = 0;
+
+  function spawnStardust(x, y, count = 2) {
+    for (let i = 0; i < count; i++) {
+      interactiveParticles.push(new Stardust(x, y));
+    }
+  }
+
+  window.addEventListener('mousemove', (e) => {
+    spawnStardust(e.clientX, e.clientY, 1);
+
+    // 3D Card Tilt
+    if (letterCard && window.innerWidth > 768) {
+      const rect = letterCard.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const deltaX = (e.clientX - centerX) / (window.innerWidth / 2);
+      const deltaY = (e.clientY - centerY) / (window.innerHeight / 2);
+
+      const rotateY = deltaX * 5.5;
+      const rotateX = -deltaY * 5.5;
+
+      letterCard.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    }
+  });
+
+  window.addEventListener('mouseleave', () => {
+    if (letterCard) {
+      letterCard.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    }
+  });
+
+  window.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 0) {
+      const t = e.touches[0];
+      spawnStardust(t.clientX, t.clientY, 2);
+    }
+  }, { passive: true });
+
+  window.addEventListener('click', (e) => {
+    ripples.push(new LightRipple(e.clientX, e.clientY));
+    for (let i = 0; i < 18; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 2.5 + 1.2;
+      interactiveParticles.push(new Stardust(
+        e.clientX,
+        e.clientY,
+        Math.cos(angle) * speed,
+        Math.sin(angle) * speed
+      ));
+    }
+    ensureAudio();
+  });
+
+  /* ----------------------------------------------------------
+     5. ALWAYS-ON AUDIO (AUTO-START & RESILIENT LOOP)
   ----------------------------------------------------------- */
   let audioCtx = null;
   let isPlayingAudio = false;
@@ -234,7 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Serene pentatonic notes for forest ambiance (D, F#, A, B, C#, E)
   const pentatonicNotes = [
     293.66, // D4
     369.99, // F#4
@@ -270,7 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isPlayingAudio || !audioCtx) return;
     const now = audioCtx.currentTime;
 
-    // Pick 3-4 gentle cascading notes
     const count = 3 + Math.floor(Math.random() * 2);
     for (let i = 0; i < count; i++) {
       const note = pentatonicNotes[Math.floor(Math.random() * pentatonicNotes.length)];
@@ -278,29 +416,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function toggleAudio() {
-    if (isPlayingAudio) {
-      isPlayingAudio = false;
-      clearInterval(melodyInterval);
-      soundBtn.classList.remove('active');
-      soundLabel.textContent = 'Bật giai điệu';
-    } else {
-      initAudio();
+  function startAudioEngine() {
+    initAudio();
+    if (!isPlayingAudio) {
       isPlayingAudio = true;
-      soundBtn.classList.add('active');
-      soundLabel.textContent = 'Tắt giai điệu';
       playNextArpeggio();
-      melodyInterval = setInterval(playNextArpeggio, 3600);
+      if (!melodyInterval) {
+        melodyInterval = setInterval(playNextArpeggio, 3600);
+      }
+      if (audioStatusText) audioStatusText.textContent = 'Giai điệu đang phát';
+      if (audioIndicator) audioIndicator.style.opacity = '1';
     }
   }
 
-  soundBtn.addEventListener('click', toggleAudio);
-
-  // Optional: Gentle click anywhere to start audio if desired
-  document.body.addEventListener('click', () => {
-    if (!isPlayingAudio && !sessionStorage.getItem('interacted')) {
-      sessionStorage.setItem('interacted', 'true');
-      toggleAudio();
+  function ensureAudio() {
+    startAudioEngine();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
     }
-  }, { once: true });
+  }
+
+  // Auto-start listeners on any interaction
+  ['click', 'touchstart', 'pointerdown', 'keydown', 'scroll'].forEach(evt => {
+    window.addEventListener(evt, ensureAudio, { once: true, passive: true });
+  });
+
+  // Try immediate autoplay
+  try {
+    startAudioEngine();
+  } catch (e) {}
+
+  // Toggle button for user preference
+  audioIndicator.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (isPlayingAudio) {
+      isPlayingAudio = false;
+      clearInterval(melodyInterval);
+      melodyInterval = null;
+      audioStatusText.textContent = 'Đã tạm dừng';
+      audioIndicator.style.opacity = '0.6';
+    } else {
+      startAudioEngine();
+    }
+  });
+
 });

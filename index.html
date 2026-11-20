@@ -11,19 +11,20 @@
 </head>
 <body>
 
-  <!-- Dynamic Painted Canvas for sunlight rays, flying light birds & golden dust -->
+  <!-- Dynamic Painted Canvas for sunlight rays, flying light birds & interactive stardust -->
   <div class="bg-art" id="bgArt"></div>
   <div class="sunbeam-overlay"></div>
   <canvas id="natureCanvas"></canvas>
 
-  <!-- Minimalist Audio Control (No flashy icons) -->
-  <button id="soundToggleBtn" class="sound-control-btn" title="Bật/Tắt giai điệu">
-    <span id="soundLabel">Bật giai điệu</span>
-  </button>
+  <!-- Interactive Hint & Audio Status -->
+  <div class="audio-status-indicator" id="audioIndicator" title="Chạm bất kỳ đâu để tương tác và cảm nhận giai điệu">
+    <span class="pulse-dot"></span>
+    <span id="audioStatusText">Giai điệu đang phát</span>
+  </div>
 
   <!-- Main Container -->
   <main class="page-container">
-    <article class="letter-card">
+    <article class="letter-card" id="letterCard">
       
       <div class="card-glow"></div>
       
@@ -33,7 +34,7 @@
         <div class="gold-divider"></div>
       </header>
 
-      <!-- Unified Heartfelt Wish (Không tách rời, liền mạch, tinh tế) -->
+      <!-- Unified Heartfelt Wish -->
       <section class="card-content">
         <p class="greeting-paragraph">
           Dạ nhân dịp 20/11, em xin cảm ơn anh Khal vì tất cả những gì mà anh đã dạy tụi em, cũng như tất cả những gì mà em nhận được từ anh. Với em, anh không chỉ là một người thầy, người anh mà còn là người đã cho em niềm tin, cơ hội để thử sức, để vùng vẫy, để trưởng thành. Em chúc anh Khal luôn luôn khỏe mạnh, dễ thương, sự nghiệp thành công, giữ mãi ngọn lửa và tình yêu với nghề.
@@ -43,7 +44,6 @@
       <footer class="card-footer">
         <div class="closing-phrase">Kính chúc anh luôn bình an, hạnh phúc và tràn đầy nhiệt huyết</div>
         <div class="sign-block">
-          <span class="sender-role">Học trò của anh</span>
           <span class="date-tag">20 tháng 11</span>
         </div>
       </footer>

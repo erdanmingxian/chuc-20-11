@@ -26,6 +26,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: default;
 }
 
 /* Background Artwork with Subtle Breathing / Pan */
@@ -73,7 +74,7 @@ body {
   100% { opacity: 1; }
 }
 
-/* Canvas for Light Birds & Golden Dust */
+/* Canvas for Light Birds, Golden Dust & Cursor Magic */
 #natureCanvas {
   position: fixed;
   top: 0;
@@ -84,42 +85,48 @@ body {
   z-index: 3;
 }
 
-/* Minimalist Sound Control */
-.sound-control-btn {
+/* Audio Status Indicator (Subtle & Automatic) */
+.audio-status-indicator {
   position: fixed;
   top: 24px;
   right: 28px;
   z-index: 20;
-  background: rgba(14, 25, 20, 0.55);
+  background: rgba(14, 25, 20, 0.6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 240, 190, 0.35);
+  border: 1px solid rgba(255, 240, 190, 0.3);
   color: var(--gold-light);
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  padding: 10px 22px;
+  padding: 8px 18px;
   border-radius: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
   transition: all 0.35s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  user-select: none;
 }
 
-.sound-control-btn:hover {
-  background: rgba(246, 211, 101, 0.2);
-  border-color: var(--gold-primary);
-  box-shadow: 0 0 20px rgba(246, 211, 101, 0.4);
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  box-shadow: 0 0 10px var(--gold-primary);
+  animation: pulseDot 1.8s infinite ease-in-out;
 }
 
-.sound-control-btn.active {
-  background: rgba(246, 211, 101, 0.28);
-  border-color: var(--gold-primary);
-  box-shadow: 0 0 18px rgba(246, 211, 101, 0.5);
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.3); }
 }
 
-/* Page Container */
+/* Page Container with 3D Perspective */
 .page-container {
   position: relative;
   z-index: 10;
@@ -129,9 +136,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  perspective: 1200px;
 }
 
-/* Elegant Letter Card */
+/* Elegant Letter Card with 3D interactive tilt */
 .letter-card {
   position: relative;
   width: 100%;
@@ -143,7 +151,9 @@ body {
   padding: 56px 52px;
   box-shadow: var(--card-shadow);
   overflow: hidden;
+  transition: transform 0.25s ease-out, box-shadow 0.3s ease;
   animation: cardFadeIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform;
 }
 
 @keyframes cardFadeIn {
@@ -163,9 +173,10 @@ body {
   right: 0;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(255, 235, 170, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 235, 170, 0.18) 0%, transparent 70%);
   filter: blur(40px);
   pointer-events: none;
+  transition: transform 0.4s ease;
 }
 
 /* Header */
@@ -231,7 +242,7 @@ body {
   font-style: italic;
   font-size: 1.25rem;
   color: var(--gold-light);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   opacity: 0.92;
 }
 
@@ -241,13 +252,8 @@ body {
   align-items: center;
   gap: 16px;
   font-size: 0.85rem;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   color: var(--text-muted);
-}
-
-.sender-role {
-  font-weight: 600;
-  color: #ffffff;
 }
 
 .date-tag {
@@ -281,10 +287,10 @@ body {
     font-size: 1.1rem;
   }
 
-  .sound-control-btn {
+  .audio-status-indicator {
     top: 16px;
     right: 16px;
-    padding: 8px 16px;
-    font-size: 0.75rem;
+    padding: 6px 14px;
+    font-size: 0.72rem;
   }
 }
